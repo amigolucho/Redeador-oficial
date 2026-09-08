@@ -9,7 +9,7 @@ def parse_HTTP_message(http_message):
     http_message = http_message.decode()
 
     # Separamos BODY y HEAD
-    print(f"mensaje incial sin procesar {http_message}")
+    #print(f"mensaje incial sin procesar {http_message}")
     head, body = http_message.split("\r\n\r\n", 1)
     
     # Dividimos el header en líneas
@@ -67,6 +67,7 @@ def get_headers(message):
     head.pop("body", None)
     return head
 
+# Funcion que se encarga de recibir todo el mensaje independiente del tamaño del buffer
 def recive_full_message(socket, buff_size):
     end_seq = b'\r\n\r\n'
 
@@ -77,23 +78,22 @@ def recive_full_message(socket, buff_size):
     # ver si llego completo e ir iterando
     is_complete = end_seq in recv_message
     
-    #print(f"esta completo? {is_complete}")
     while not is_complete:
         recv_message = socket.recv(buff_size)
         full_message += recv_message
         is_complete = end_seq in recv_message
     
     headers = get_headers(full_message)
-    #print(f"headers {headers}")
     if "method" in headers:
         return full_message
 
+    # Ae busca el body
     cont_len = int(headers["Content-Length"])
     head_end = full_message.find(end_seq) + len(end_seq)
     body_received = len(full_message) - head_end
     rest = cont_len - body_received
 
-    #sacamos todo el contenido de body q venga
+    #sacamos todo el contenido de body que venga
     while rest > 0:
         recv_message = socket.recv(buff_size)
         full_message += recv_message
@@ -108,7 +108,10 @@ if __name__ == "__main__":
     
     with open(file_path, 'r', encoding='utf-8') as f:
         datos = json.load(f)
-    user_name = datos["nombre"]
+
+    USER = datos["nombre"]
+    FORBIDDEN = datos["forbidden_words"]
+    BLOCKED = datos["blocked"]
     
     buff_size = 1000
     server_socket_address = ('0.0.0.0', 8000)
@@ -132,7 +135,8 @@ if __name__ == "__main__":
         
         # Obtenemos el Host y el puesto si es que hay
         parsed_msg = parse_HTTP_message(recv_message)
-        parsed_msg["X-ElQuePregunta"] = user_name
+        print(f"PETICION RECIBIDA: {parsed_msg.get('path')}")
+        parsed_msg["X-ElQuePregunta"] = USER
         host_header = parsed_msg["Host"]
 
         if ":" in host_header:
@@ -141,16 +145,34 @@ if __name__ == "__main__":
         else:
             host = host_header
             port = 80 #pueto tipico de protocolo http
-                
-        if datos["blocked"] in parsed_msg["path"]:
-            print("Intentando acceder a un host blockeado")
-            cat_html =  "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1><p>El dominio solicitado esta bloqueado por el proxy.</p><img src=\"/images.jpeg\" alt=\"Acceso bloqueado\"></body></html>"
-            error_response = {'status':'error', 'code':'403', 
-                'version':parsed_msg['version'], 'body':cat_html}
-            a = create_HTTP_message(error_response)
-            print(a, "ola")
-            new_socket.send(a)
+
+        # Si piden la imagen del 403, la respondemos directo desde acá
+        if parsed_msg["path"].endswith("/images.jpeg"):
+            with open("images.jpeg", "rb") as f:
+                img_bytes = f.read()
+            response_line = f"{parsed_msg['version']} 200 OK\r\n"
+            headers = f"Content-Type: image/jpeg\r\nContent-Length: {len(img_bytes)}\r\n\r\n"
+            new_socket.send(response_line.encode() + headers.encode() + img_bytes)
             new_socket.close()
+            continue
+                
+        # Engloba los casos donde no se pone el http
+        blocked = False
+        for url in BLOCKED:
+            if url in parsed_msg["path"]:
+                print("Intentando acceder a un host blockeado")
+                cat_html =  "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1><p>El dominio solicitado esta bloqueado por el proxy.</p><img src=\"/images.jpeg\" alt=\"Acceso bloqueado\"></body></html>"
+                error_response = {'status':'error', 'code':'403', 
+                    'version':parsed_msg['version'], 'body':cat_html,
+                    'Content-Type': 'text/html'}
+                a = create_HTTP_message(error_response)
+                print(a, "ola")
+                new_socket.send(a)
+                new_socket.close()
+                
+                blocked = True
+                break
+        if blocked:
             continue
             
         print(f"El cliente se quiere conectar al host {host_header}")
@@ -159,20 +181,18 @@ if __name__ == "__main__":
         client_socket.connect((host,port))
         client_socket.send(create_HTTP_message(parsed_msg))
         print("mensaje reenviado al server, esperando respuesta...")
-        print("chek1")
 
         #esperamos respuesta del server y reenviamos al cliente con las palabras reemplazadas
         response = recive_full_message(client_socket, buff_size)
-        print("respuesta del servidor",response)
+        #print("respuesta del servidor",response)
         parsed_response = parse_HTTP_message(response)
-        print(f"lens {len(parsed_response["body"])} y delr clen {parsed_response["Content-Length"]}")
-        forbidden_words = datos["forbidden_words"]
-        for word, replace in forbidden_words.items():
+        #print(f"lens {len(parsed_response["body"])} y delr clen {parsed_response["Content-Length"]}")
+        for word, replace in FORBIDDEN.items():
             if word in parsed_response["body"]:
                 parsed_response["body"] = parsed_response["body"].replace(word, replace)
 
         parsed_response["Content-Length"] = str(len(parsed_response["body"].encode()))
-        print("respuesta filtrada", create_HTTP_message(parsed_response))
+        #print("respuesta filtrada", create_HTTP_message(parsed_response))
         new_socket.send(create_HTTP_message(parsed_response))
 
         # cerramos la conexión
