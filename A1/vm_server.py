@@ -161,7 +161,7 @@ if __name__ == "__main__":
         for url in BLOCKED:
             if url in parsed_msg["path"]:
                 print("Intentando acceder a un host blockeado")
-                cat_html =  "<!DOCTYPE html><html><head><title>403 Forbidden</title></head><body><h1>403 Forbidden</h1><p>El dominio solicitado esta bloqueado por el proxy.</p><img src=\"/images.jpeg\" alt=\"Acceso bloqueado\"></body></html>"
+                cat_html =  "<!DOCTYPE html><html><head><title>403   Forbidden</title></head><body><h1>403 Forbidden</h1><p>El dominio solicitado esta bloqueado por el proxy.</p><img src=\"/images.jpeg\" alt=\"Acceso bloqueado\"></body></html>"
                 error_response = {'status':'error', 'code':'403', 
                     'version':parsed_msg['version'], 'body':cat_html,
                     'Content-Type': 'text/html'}
