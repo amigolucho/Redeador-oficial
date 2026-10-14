@@ -24,7 +24,7 @@ if __name__ == "__main__":
     print("CHECK 3")
 
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(address)
+    server_socket.bind(('localhost', 3000))
     print("Socket de servidor creado con exito")
 
     server_socket.listen(1)

@@ -11,7 +11,9 @@ if __name__ == "__main__":
     client_socketTCP.connect(address)
     print("CHECK 2")
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(address)
+    import time
+    time.sleep(10)
+    client_socket.connect(('localhost', 3000))
 
     
     file_path = input("Ingrese la ruta de su archivo ")
