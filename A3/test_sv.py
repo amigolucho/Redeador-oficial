@@ -8,6 +8,17 @@ print("[DEBUG] bind OK, escuchando en", server_socketTCP.bind_address)
 print("[DEBUG] esperando accept()...")
 connection_socketTCP, new_address = server_socketTCP.accept()
 print("[DEBUG] accept OK")
+print("[DEBUG] ===== RESUMEN DE CONNECTIONS =====")
+for nombre, sock in (("server_socketTCP    ", server_socketTCP),
+                     ("connection_socketTCP", connection_socketTCP)):
+    print(f"[DEBUG]   {nombre} | "
+          f"bind_address={getattr(sock, 'bind_address', None)} | "
+          f"connect_address={getattr(sock, 'connect_address', None)} | "
+          f"seq={getattr(sock, 'seq', None)}")
+print("[DEBUG]   new_address (de accept) =", new_address)
+print("[DEBUG]   conexion usa puerto distinto al server? =",
+      getattr(connection_socketTCP, 'bind_address', None) != server_socketTCP.bind_address)
+print("[DEBUG] ===================================")
 print("[DEBUG]   new_address         =", new_address)
 print("[DEBUG]   cliente (dest)      =", connection_socketTCP.connect_address)
 print("[DEBUG]   seq tras handshake  =", connection_socketTCP.seq)
@@ -46,3 +57,6 @@ print("[DEBUG] parte1 + parte2 = %r (len=%d)" % (
 print("Test 3 received:", message_part_1 + message_part_2)
 if (message_part_1 + message_part_2) == "Mensaje de largo 19".encode(): print("Test 3: Passed")
 else: print("Test 3: Failed")
+
+print("[DEBUG] Cerrando conexion")
+connection_socketTCP.recv_close()

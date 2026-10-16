@@ -33,3 +33,6 @@ print("[DEBUG] enviando %r (len=%d) | seq antes=%d" % (message, len(message), cl
 client_socketTCP.send(message)
 print("[DEBUG] send OK | seq despues=%d" % client_socketTCP.seq)
 print("[DEBUG] fin de los tests del cliente")
+
+print("[DEBUG] Cerrando conexion")
+client_socketTCP.close()
