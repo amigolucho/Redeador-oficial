@@ -1,52 +1,57 @@
-import socket
-import random
-import SocketTCP
+import SocketTCP   # si tu archivo se llama SocketTCP.py, usa: import SocketTCP
+import sys
+# CLIENT
 
-if __name__ == "__main__":
-    BUFF_SIZE = 16 # Bytes
+# Uso: python3 test_cl.py localhost 8000 < archivo.txt
+if len(sys.argv) != 3:
+    print("Uso: python3 test_cl.py <host> <puerto> < archivo.txt")
+    sys.exit(1)
+address = (sys.argv[1], int(sys.argv[2]))
 
-    address = ('localhost', 5000)
-    client_socketTCP = SocketTCP.SocketTCP()
-    print("CHECK 1")
-    client_socketTCP.connect(address)
-    print("CHECK 2")
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    import time
-    time.sleep(10)
-    client_socket.connect(('localhost', 3000))
+address = ('localhost', 5000)
 
-    
-    file_path = input("Ingrese la ruta de su archivo ")
+print("[DEBUG] creando socket cliente")
+client_socketTCP = SocketTCP.SocketTCP()
+print("[DEBUG] llamando connect(%s)..." % (address,))
+client_socketTCP.connect(address)
+print("[DEBUG] connect OK")
+print("[DEBUG]   servidor (dest)     =", client_socketTCP.connect_address)
+print("[DEBUG]   bind (dest)     =", client_socketTCP.bind_address)
+print("[DEBUG]   seq tras handshake  =", client_socketTCP.seq)
+print("[DEBUG]   dest != address?    =", client_socketTCP.bind_address != ('127.0.0.1', 5000))
 
-    with open(file_path, 'r', encoding='utf-8') as f:
-        msg = f.read()  
-        msg_length = len(msg)
-    #acá enviar el header?
 
-    ack = input("Mensaje ACK? (1 o 0): ")
-    syn = input("Mensaje SYN? (1 o 0): ")
-    fin = input("Mensaje FIN? (1 o 0): ")
-    seq = random.randint(0, 100)
-    print("Tu número de seq es ", seq)
+# test 1
+print("\n[DEBUG] ===== TEST 1 =====")
+message = "Mensje de len=16".encode()
+print("[DEBUG] enviando %r (len=%d) | seq antes=%d" % (message, len(message), client_socketTCP.seq))
+client_socketTCP.send(message)
+print("[DEBUG] send OK | seq despues=%d" % client_socketTCP.seq)
 
-    head = f"--HEAD--\nACK:{ack}\nSYN:{syn}\nFIN:{fin}\nseq:{seq}\n\r\n"
-    print("Enviando HEAD:\n", head)
-    client_socket.send(head.encode())
-    
-    i = 0 # index   
-    while msg_length > BUFF_SIZE:
-        buffer = msg[i: i + BUFF_SIZE]
+# test 2
+print("\n[DEBUG] ===== TEST 2 =====")
+message = "Mensaje de largo 19".encode()
+print("[DEBUG] enviando %r (len=%d) | seq antes=%d" % (message, len(message), client_socketTCP.seq))
+client_socketTCP.send(message)
+print("[DEBUG] send OK | seq despues=%d" % client_socketTCP.seq)
 
-        client_socket.send(buffer.encode())
-        msg_length -= BUFF_SIZE
-        i += BUFF_SIZE
-        print(f"Enviando paquete nro {i + 1}")
+# test 3
+print("\n[DEBUG] ===== TEST 3 =====")
+message = "Mensaje de largo 19".encode()
+print("[DEBUG] enviando %r (len=%d) | seq antes=%d" % (message, len(message), client_socketTCP.seq))
+client_socketTCP.send(message)
+print("[DEBUG] send OK | seq despues=%d" % client_socketTCP.seq)
+print("[DEBUG] fin de los tests del cliente")
 
-    # Mandamos el ùltimo buffer, y en caso de ser pequeño, el ùnico
-    client_socket.send(msg[-msg_length:].encode())
+#test 4
+print("\n[DEBUG] ===== TEST 4 (archivo por stdin) =====")
+message = sys.stdin.buffer.read()#  .encode()
+print(message)
+print("[DEBUG] enviando archivo (len=%d) | seq antes=%d" % (len(message), client_socketTCP.seq))
+client_socketTCP.send(message)
+print("[DEBUG] send OK | seq despues=%d" % client_socketTCP.seq)
+print("[DEBUG] fin de los tests del cliente")
 
-    print(file_path)
-    print("Mensaje en bytes ", msg.encode(), " y su largo ", len(msg))
 
-    print("Cerrando el socket, chaooo")
-    client_socket.close()
+print("[DEBUG] Cerrando conexion")
+client_socketTCP.close()

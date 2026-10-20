@@ -1,62 +1,58 @@
-import SocketTCP   # si tu archivo se llama SocketTCP.py, usa: import SocketTCP
-address = ('localhost', 5000)
-# SERVER
-print("[DEBUG] creando socket y haciendo bind en", address)
-server_socketTCP = SocketTCP.SocketTCP()
-server_socketTCP.bind(address)
-print("[DEBUG] bind OK, escuchando en", server_socketTCP.bind_address)
-print("[DEBUG] esperando accept()...")
-connection_socketTCP, new_address = server_socketTCP.accept()
-print("[DEBUG] accept OK")
-print("[DEBUG] ===== RESUMEN DE CONNECTIONS =====")
-for nombre, sock in (("server_socketTCP    ", server_socketTCP),
-                     ("connection_socketTCP", connection_socketTCP)):
-    print(f"[DEBUG]   {nombre} | "
-          f"bind_address={getattr(sock, 'bind_address', None)} | "
-          f"connect_address={getattr(sock, 'connect_address', None)} | "
-          f"seq={getattr(sock, 'seq', None)}")
-print("[DEBUG]   new_address (de accept) =", new_address)
-print("[DEBUG]   conexion usa puerto distinto al server? =",
-      getattr(connection_socketTCP, 'bind_address', None) != server_socketTCP.bind_address)
-print("[DEBUG] ===================================")
-print("[DEBUG]   new_address         =", new_address)
-print("[DEBUG]   cliente (dest)      =", connection_socketTCP.connect_address)
-print("[DEBUG]   seq tras handshake  =", connection_socketTCP.seq)
-print("[DEBUG]   direccion distinta? =", new_address != server_socketTCP.connect_address)
+import socket
+import SocketTCP
 
-# test 1
-print("\n[DEBUG] ===== TEST 1 =====")
-buff_size = 16
-expected = "Mensje de len=16".encode()
-print("[DEBUG] llamando recv(%d), esperado=%r (len=%d)" % (buff_size, expected, len(expected)))
-full_message = connection_socketTCP.recv(buff_size)
-print("Test 1 received:", full_message)
-if full_message == "Mensje de len=16".encode(): print("Test 1: Passed")
-else: print("Test 1: Failed")
+def parse_segment(seg):
+    header = {}
+    lines = seg.split('\n')
+    print(lines)
+    for line in lines:
+        if ':' in line:
+            print(line.split(":"))
+            name, info = line.split(":")
+            header[name] = info
+    return header
 
-# test 2
-print("\n[DEBUG] ===== TEST 2 =====")
-buff_size = 19
-expected = "Mensaje de largo 19".encode()
-print("[DEBUG] llamando recv(%d), esperado=%r (len=%d)" % (buff_size, expected, len(expected)))
-full_message = connection_socketTCP.recv(buff_size)
-print("Test 2 received:", full_message)
-if full_message == "Mensaje de largo 19".encode(): print("Test 2: Passed")
-else: print("Test 2: Failed")
+if __name__ == "__main__":
+    BUFF_SIZE = 16 # Bytes
 
-# test 3
-print("\n[DEBUG] ===== TEST 3 =====")
-buff_size = 14
-print("[DEBUG] llamando recv(%d) por primera vez (parte 1)" % buff_size)
-message_part_1 = connection_socketTCP.recv(buff_size)
+    address = ('localhost', 5000)
+    server_socketTCP = SocketTCP.SocketTCP()
+    print("CHECK 1")
+    server_socketTCP.bind(address)
+    print("CHECK 2")
+    connection_socketTCP, new_address = server_socketTCP.accept()
+    print("CHECK 3")
 
-print("[DEBUG] llamando recv(%d) por segunda vez (parte 2)" % buff_size)
-message_part_2 = connection_socketTCP.recv(buff_size)
-print("[DEBUG] parte1 + parte2 = %r (len=%d)" % (
-    message_part_1 + message_part_2, len(message_part_1 + message_part_2)))
-print("Test 3 received:", message_part_1 + message_part_2)
-if (message_part_1 + message_part_2) == "Mensaje de largo 19".encode(): print("Test 3: Passed")
-else: print("Test 3: Failed")
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(('localhost', 3000))
+    print("Socket de servidor creado con exito")
 
-print("[DEBUG] Cerrando conexion")
-connection_socketTCP.recv_close()
+    server_socket.listen(1)
+
+    while True:
+        msg = ""
+        new_socket, new_socket_address = server_socket.accept()
+        print("Aceptando nueva conexion, recibimos mensajes")
+        print("Esperando el HEAD")
+        head = new_socket.recv(37) #Tamaño del head entre 35 y 37
+        print("HEAD\n", head.decode())
+        info = parse_segment(head.decode())
+        
+        buffer = new_socket.recv(BUFF_SIZE) 
+
+        while len(buffer) > 0: # mientras se reciba mensaje
+            #print(buffer)
+            #print(len(buffer))
+            msg += buffer.decode()
+            buffer = new_socket.recv(BUFF_SIZE) 
+
+        print(f"Mensaje recibido con exito: {msg}, con un largo {len(msg)}") 
+    
+    print("Cerrando socket, chaooo")
+    server_socket.close()
+
+
+
+
+
+
