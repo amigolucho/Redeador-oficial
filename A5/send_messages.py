@@ -10,9 +10,15 @@ def debug_print(message):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        print("Uso: python send_messages.py (<IP> <PORT>) <message> (<IP> <PORT>)")
+        print("Uso: python send_messages.py <IP:PORT destino> <mensaje> <IP:PORT envío>")
         sys.exit(1)
-    (dest_ip, dest_port), msg, (ip, port) = sys.argv[1], sys.argv[2], sys.argv[3]
+
+    dest_ip, dest_port = sys.argv[1].split(":")
+    msg = sys.argv[2]
+    ip, port = sys.argv[3].split(":")
+
+    dest_port = int(dest_port)
+    port = int(port)
 
     if (dest_ip, dest_port) == (ip, port):
         print("El packete ya está en la dirección de destino, no se puede enviar a sí mismo.")
