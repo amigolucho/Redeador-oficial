@@ -1,0 +1,21 @@
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '5', 'flag': '0', 'msg': 'aaaaa'}
+mensaje=5 MTU=100 total=33 -> 1 fragmentos, tamaños: [8]
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '5', 'flag': '0', 'msg': 'aaaaa'}
+mensaje=5 MTU=50 total=33 -> 1 fragmentos, tamaños: [8]
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '122', 'flag': '0', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+mensaje=122 MTU=150 total=152 -> 1 fragmentos, tamaños: [8]
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '42', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '43', 'size': '42', 'flag': '0', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+mensaje=122 MTU=100 total=152 -> 2 fragmentos, tamaños: [8, 8]
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '32', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '33', 'size': '32', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '33', 'size': '32', 'flag': '0', 'msg': 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+mensaje=122 MTU=80 total=152 -> 3 fragmentos, tamaños: [8, 8, 8]
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '0', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '1', 'msg': 'aaaaaaaaaaaaaaaaa'}
+[DEBUG] No es necesario fragmentar el paquete: {'ip': '127.0.0.1', 'port': 8885, 'ttl': '10', 'id': '347', 'offset': '18', 'size': '17', 'flag': '0', 'msg': 'aaaaaaaaaaaaaaaaaaaa'}
+mensaje=122 MTU=50 total=152 -> 7 fragmentos, tamaños: [8, 8, 8, 8, 8, 8, 8]
